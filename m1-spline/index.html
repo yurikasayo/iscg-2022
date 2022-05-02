@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1-Spline</title>
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <canvas class="webgl"></canvas>
+
+    <div class="comment">
+        <div class="label">コメント</div>
+        <div class="text">
+            <p class="title">
+                実装内容
+            </p>
+            <p class="content">
+                有理ベジェ曲線および3次Catmull-Romスプラインを実装しました。実装にはThree.jsライブラリを使用しました。また、lil-guiライブラリを使用し、パラメータの選択を可能にしました。
+            </p>
+            <p class="title">
+                考察
+            </p>
+            <p class="content">
+                有理ベジェ曲線について、形状調整にはw1の調整が最も有効であり、w0およびw2の調整では頂点の間隔以外の変化は少ないと分かった。また、重みを負の値にすると大変形が起こりやすいということがわかった。
+            </p>
+            <p class="content">
+                3次Catmull-Romスプラインでは、3種類のノット列を実装した。uniformは曲線が制御点間から大きく離れないがひっくり返りが起こりやすく、chordalは制御点間から大きく離れやすいがひっくり返りが起こりにくく、centripetalは中庸で扱いやすいと感じた。
+
+            </p>
+            <p class="title">
+                感想
+            </p>
+            <p class="content">
+                曲線描画の前の枠組みづくりに思ったより時間がかかってしまった。自分の作ったプログラムで授業で習った理論を体験できるのは感銘を受けた。κ-CurvesやC2 interpolatingも今後時間のある時に実装してみたいと思った。
+            </p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>
