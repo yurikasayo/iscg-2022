@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1-Kinematics</title>
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <canvas class="webgl"></canvas>
+
+    <div class="comment">
+        <div class="label">コメント</div>
+        <div class="text">
+            <p class="title">
+                実装内容
+            </p>
+            <p class="content">
+                CyclicCoordinateDescent法でIKを実装しました。実装にはThree.jsライブラリを使用しました。また、lil-guiライブラリを使用し、パラメータの選択を可能にしました。
+            </p>
+            <p class="title">
+                考察
+            </p>
+            <p class="content">
+                解くのにかかるステップ数は目標点との距離等で変わるが、あまり距離が離れていなければ10回程度で解くことができるとわかりました。
+            </p>
+            </p>
+            <p class="title">
+                感想
+            </p>
+            <p class="content">
+                関節の回転にEasingを入れ、回転角を求めるまでの経過を観察できるようにしたら、興味深いアニメーションが得られました。
+            </p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>
