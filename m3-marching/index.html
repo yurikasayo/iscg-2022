@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M2-Subdivide</title>
+    <title>M3-Marching</title>
     <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16.1/dist/lil-gui.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/controls/OrbitControls.js"></script>
@@ -21,23 +21,23 @@
                 実装内容
             </p>
             <p class="content">
-                Catmull-Clerk法によるサブディビジョンを実装しました。実装にはThree.jsライブラリを使用しました。また、lil-guiライブラリを使用し、パラメータの選択を可能にしました。
+                Marching Tetrahedraを実装しました。実装にはThree.jsライブラリを使用しました。
             </p>
             <p class="title">
                 考察
             </p>
             <p class="content">
-                元の頂点数が多いと、計算時間がかなり長くなるとわかりました。
+                グリッドのサイズを小さくすると、計算時間が大きくなるとわかりました。
             </p>
             <p class="content">
-                3角形メッシュが含まれていても、サブディビジョンは可能でした。
+                勾配を考慮しない方法だと、端のがたつきが目立つとわかりました。。
 
             </p>
             <p class="title">
                 感想
             </p>
             <p class="content">
-                WebGLは四角形メッシュでの描画のみしかできないため、三角形メッシュで四角形メッシュを表現するのに苦労しました。
+                陰関数を使ってメッシュを切る方法があることを初めて知り、驚きました。
             </p>
         </div>
     </div>
