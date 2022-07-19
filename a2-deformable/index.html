@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2-Deformable</title>
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16.1/dist/lil-gui.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/misc/GPUComputationRenderer.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <canvas class="webgl"></canvas>
+
+    <!-- <div class="label">コメント</div> -->
+    <div class="comment">
+        <div class="text">
+            <p class="title">
+                実装内容
+            </p>
+            <p class="content">
+                ばね・マス・ダンパモデルでの3次元の弾性体シミュレーションを実装しました。
+                各ステップの更新はSemi-Implicit Euler積分で行いました。実装にはThree.jsライブラリを使用しました。
+                また、GPGPUで各頂点の位置・速度の更新を並列で行うことで、頂点数が多いモデルをリアルタイムで扱えるようにしました。
+            </p>
+            <p class="title">
+                考察
+            </p>
+            <p class="content">
+                Semi-Implicit Euler積分は、Forward Euler積分に比べ安定だということがわかりました。
+            </p>
+            <p class="content">
+                PBDでもGPGPU実装を試みましたが、制約の並列化の点で安定した実装は難しいことがわかりました。
+            </p>
+            <p class="title">
+                感想
+            </p>
+            <p class="content">
+                ばね定数等のパラメータ調整が難しかったです。
+            </p>
+        </div>
+    </div>
+
+    <div class="ui">
+        <button type="button" class="right">right</button>
+        <button type="button" class="left">left</button>
+        <button type="button" class="up">up</button>
+        <button type="button" class="down">down</button>
+        <button type="button" class="ccw">ccw</button>
+        <button type="button" class="acw">acw</button>
+    </div>
+    
+    <script src="./script.js"></script>
+</body>
+
+</html>

@@ -101,55 +101,55 @@ loader.load('./models/suzanne.obj',(text) =>
 /**
  * Subdivide
  */
- const addRelevance = (obj) => 
- {
-     const lineids = []
-     const line2face = []
-     const face2line = []
-     const vertice2line = []
-     const vertice2face = []
- 
-     for (let i = 0; i < obj.v.length; i++)
-     {
-         vertice2line.push([])
-         vertice2face.push([])
-     }
- 
-     for (let i = 0; i < obj.f.length; i++) {
-         const faceid = obj.f[i]
-         face2line.push([])
-         for (let j = 0; j < faceid.length; j++) {
-             const id1 = faceid[j]
-             const id2 = faceid[(j+1)%faceid.length]
-             const ids = [Math.min(id1,id2),Math.max(id1,id2)]
- 
-             const index = lineids.findIndex(item => JSON.stringify(item) == JSON.stringify(ids))
-             if (index == -1)
-             {
-                 lineids.push(ids)
-                 line2face.push([i])
-                 vertice2line[id1].push(lineids.length-1)
-                 vertice2line[id2].push(lineids.length-1)
-                 face2line[i].push(lineids.length-1)
-             } 
-             else
-             {
-                 line2face[index].push(i)
-                 face2line[i].push(index)
-             }
-             
-             vertice2face[id1].push(i)
-         }
-     }
- 
-     obj.l = lineids
-     obj.l2f = line2face
-     obj.f2l = face2line
-     obj.v2l = vertice2line
-     obj.v2f = vertice2face
- 
-     return obj
- }
+const addRelevance = (obj) => 
+{
+    const lineids = []
+    const line2face = []
+    const face2line = []
+    const vertice2line = []
+    const vertice2face = []
+
+    for (let i = 0; i < obj.v.length; i++)
+    {
+        vertice2line.push([])
+        vertice2face.push([])
+    }
+
+    for (let i = 0; i < obj.f.length; i++) {
+        const faceid = obj.f[i]
+        face2line.push([])
+        for (let j = 0; j < faceid.length; j++) {
+            const id1 = faceid[j]
+            const id2 = faceid[(j+1)%faceid.length]
+            const ids = [Math.min(id1,id2),Math.max(id1,id2)]
+
+            const index = lineids.findIndex(item => JSON.stringify(item) == JSON.stringify(ids))
+            if (index == -1)
+            {
+                lineids.push(ids)
+                line2face.push([i])
+                vertice2line[id1].push(lineids.length-1)
+                vertice2line[id2].push(lineids.length-1)
+                face2line[i].push(lineids.length-1)
+            } 
+            else
+            {
+                line2face[index].push(i)
+                face2line[i].push(index)
+            }
+            
+            vertice2face[id1].push(i)
+        }
+    }
+
+    obj.l = lineids
+    obj.l2f = line2face
+    obj.f2l = face2line
+    obj.v2l = vertice2line
+    obj.v2f = vertice2face
+
+    return obj
+}
 
 const catmullClark = (obj) =>
 {
@@ -374,19 +374,19 @@ gui.add(debugObject,'subdivide')
 /**
  * Lights
  */
- const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
- scene.add(ambientLight)
- 
- const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7)
- directionalLight.castShadow = true
- directionalLight.shadow.mapSize.set(1024, 1024)
- directionalLight.shadow.camera.far = 15
- directionalLight.shadow.camera.left = - 7
- directionalLight.shadow.camera.top = 7
- directionalLight.shadow.camera.right = 7
- directionalLight.shadow.camera.bottom = - 7
- directionalLight.position.set(5, 5, 5)
- scene.add(directionalLight)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
+scene.add(ambientLight)
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7)
+directionalLight.castShadow = true
+directionalLight.shadow.mapSize.set(1024, 1024)
+directionalLight.shadow.camera.far = 15
+directionalLight.shadow.camera.left = - 7
+directionalLight.shadow.camera.top = 7
+directionalLight.shadow.camera.right = 7
+directionalLight.shadow.camera.bottom = - 7
+directionalLight.position.set(5, 5, 5)
+scene.add(directionalLight)
 
 
 /**
