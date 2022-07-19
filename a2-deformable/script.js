@@ -223,10 +223,8 @@ const loadMesh = (msh, obj) =>
 }
 
 let msh, obj;
-// loader.load('./mesh/suzanne.msh', (text) => { msh = text })
-// loader.load('./mesh/suzanne.msh__sf.obj', (text) => { obj = text })
-loader.load('./mesh/roundBar.msh', (text) => { msh = text })
-loader.load('./mesh/roundBar.msh__sf.obj', (text) => { obj = text })
+loader.load('./mesh/roundBar_low.msh', (text) => { msh = text })
+loader.load('./mesh/roundBar_low.msh__sf.obj', (text) => { obj = text })
 
 let meshData = null
 THREE.DefaultLoadingManager.onLoad = () =>
