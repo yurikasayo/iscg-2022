@@ -92,7 +92,7 @@ body
 
 button
 {
-    background-color: #4CAF50; /* Green */
+    background-color: #346536; /* Green */
     border: none;
     border-radius: 32px;
     cursor: pointer;
@@ -108,7 +108,7 @@ button
 
 button:hover
 {
-    background-color: #77EE77;
+    background-color: #4eb94e;
 }
 
 input[type="range"]
@@ -131,10 +131,10 @@ input[type="range"]
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    box-shadow: -500px 0 0 486px #4CAF50;
+    box-shadow: -500px 0 0 486px #346536;
 }
 
 ::-webkit-slider-runnable-track 
 {
-    background: #ddd;
+    background: #ccc;
 }

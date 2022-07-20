@@ -6,6 +6,7 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+scene.fog = new THREE.Fog(0xeeeeee, 20, 60)
 
 
 /**
@@ -25,6 +26,7 @@ uniform float dataWidth;
 uniform float k;
 uniform float kd;
 uniform float kc;
+uniform float mag;
 uniform float dt;
 
 void main() {
@@ -55,25 +57,25 @@ void main() {
         vec2 xz = texture2D(invMassTexture, uv).zw;
         switch (forceMode) {
         case 1:
-            force = vec3(5.0, 0.0, 0.0);
+            force = vec3(10.0, 0.0, 0.0);
             break;
         case 2:
-            force = vec3(-5.0, 0.0, 0.0);
+            force = vec3(-10.0, 0.0, 0.0);
             break;
         case 3:
-            force = vec3(0.0, 20.0, 0.0);
+            force = vec3(0.0, 40.0, 0.0);
             break;
         case 4:
-            force = vec3(0.0, -15.0, 0.0);
+            force = vec3(0.0, -20.0, 0.0);
             break;
         case 5:
-            force = vec3(-20.0 * xz.y, 0.0, 20.0 * xz.x);
+            force = vec3(-40.0 * xz.y, 0.0, 40.0 * xz.x);
             break;
         case 6:
-            force = vec3(20.0 * xz.y, 0.0, -20.0 * xz.x);
+            force = vec3(40.0 * xz.y, 0.0, -40.0 * xz.x);
             break;
         }
-        dv += force * invMass;
+        dv += mag * force * invMass;
     }
 
     if (p.y < 0.0) {
@@ -111,15 +113,15 @@ void main() {
 /**
  * Parameters
  */
-const k  = 200.0
-const kd = 0.001
+const k  = 500.0
+const kd = 0.01
 const kc = 1000.0
-const dt = 1.0 / 60.0
-const numSteps = 150
+const dt = 1.0 / 120.0
+const numSteps = 80
 const sdt = dt / numSteps
 const gravity = new THREE.Vector3(0, -9.8, 0)
 const force = new THREE.Vector3(0, 0, 0)
-const dataWidth = 32
+const dataWidth = 24
 
 
 /**
@@ -277,7 +279,7 @@ let geometry
 let positionAttributes
 
 const material = new THREE.MeshStandardMaterial({
-    color: 0xff6600,
+    color: 0xcc9900,
     transparent: true,
     roughness: 0.2,
 })
@@ -308,7 +310,7 @@ const createMesh = () => {
  * Plane
  */
 const planeGeometry = new THREE.PlaneGeometry(1000, 1000)
-const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff })
+const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x999999 })
 const plane = new THREE.Mesh(planeGeometry, planeMaterial)
 scene.add(plane)
 plane.rotation.x = -Math.PI / 2
@@ -319,10 +321,10 @@ plane.receiveShadow = true
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffddaa, 0.5)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 40
@@ -373,6 +375,7 @@ scene.add(camera)
 const controls = new THREE.OrbitControls(camera, canvas)
 controls.enableDamping = true
 controls.dampingFactor = 0.1
+controls.maxPolarAngle = Math.PI * 0.48; 
 
 
 /**
@@ -383,7 +386,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor(0xbbeeff)
+renderer.setClearColor(0xeeeeee)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
@@ -427,6 +430,7 @@ const createFbos = () =>
     velocityVariable.material.uniforms['k'] = { value: k }
     velocityVariable.material.uniforms['kd'] = { value: kd }
     velocityVariable.material.uniforms['kc'] = { value: kc }
+    velocityVariable.material.uniforms['mag'] = { value: 0.5 }
     velocityVariable.material.uniforms['dt'] = { value: sdt }
 
     // init compute renderer
@@ -450,7 +454,7 @@ const simulate = () =>
         preprocessed = true
     }
 
-    velocityVariable.material.uniforms['k'].value = slider.value
+    velocityVariable.material.uniforms['mag'].value = slider.value
     
     for (let step = 0; step < numSteps; step++)
     {
@@ -483,7 +487,7 @@ const downButton  = document.querySelector('button.down')
 const ccwButton   = document.querySelector('button.ccw')
 const acwButton   = document.querySelector('button.acw')
 
-const slider = document.querySelector('.k')
+const slider = document.querySelector('.mag')
 
 rightButton.addEventListener('mousedown', () =>
 {
