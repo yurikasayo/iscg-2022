@@ -1,11 +1,4 @@
 /**
- * GUI
- */
-const GUI = lil.GUI
-const gui = new GUI()
-const debugObject = {}
-
-/**
  * Base
  */
 // Canvas
@@ -118,11 +111,11 @@ void main() {
 /**
  * Parameters
  */
-const k  = 300.0
-const kd = 0.02
-const kc = 10000.0
+const k  = 200.0
+const kd = 0.001
+const kc = 1000.0
 const dt = 1.0 / 60.0
-const numSteps = 200
+const numSteps = 150
 const sdt = dt / numSteps
 const gravity = new THREE.Vector3(0, -9.8, 0)
 const force = new THREE.Vector3(0, 0, 0)
@@ -223,8 +216,8 @@ const loadMesh = (msh, obj) =>
 }
 
 let msh, obj;
-loader.load('./mesh/roundBar_low.msh', (text) => { msh = text })
-loader.load('./mesh/roundBar_low.msh__sf.obj', (text) => { obj = text })
+loader.load('./mesh/roundBar.msh', (text) => { msh = text })
+loader.load('./mesh/roundBar.obj', (text) => { obj = text })
 
 let meshData = null
 THREE.DefaultLoadingManager.onLoad = () =>
@@ -283,7 +276,11 @@ let mesh
 let geometry
 let positionAttributes
 
-const material = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0 })
+const material = new THREE.MeshStandardMaterial({
+    color: 0xff6600,
+    transparent: true,
+    roughness: 0.2,
+})
 
 const createMesh = () => {
     geometry = new THREE.BufferGeometry()
@@ -322,10 +319,10 @@ plane.receiveShadow = true
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
+const ambientLight = new THREE.AmbientLight(0xffddaa, 0.5)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 40
@@ -333,7 +330,7 @@ directionalLight.shadow.camera.left = - 20
 directionalLight.shadow.camera.top = 20
 directionalLight.shadow.camera.right = 20
 directionalLight.shadow.camera.bottom = - 20
-directionalLight.position.set(10, 10, 10)
+directionalLight.position.set(10, 14, 12)
 scene.add(directionalLight)
 
 // const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
@@ -370,7 +367,6 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1, 200)
 camera.position.set(0, 10, 20)
-// camera.lookAt(new THREE.Vector3(5, 10, 0))
 scene.add(camera)
 
 // Controls
@@ -387,7 +383,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor(0xcccccc)
+renderer.setClearColor(0xbbeeff)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
@@ -453,6 +449,8 @@ const simulate = () =>
         createFbos()
         preprocessed = true
     }
+
+    velocityVariable.material.uniforms['k'].value = slider.value
     
     for (let step = 0; step < numSteps; step++)
     {
@@ -476,7 +474,7 @@ const simulate = () =>
 
 
 /**
- * Button Event
+ * GUI
  */
 const rightButton = document.querySelector('button.right')
 const leftButton  = document.querySelector('button.left')
@@ -484,6 +482,8 @@ const upButton    = document.querySelector('button.up')
 const downButton  = document.querySelector('button.down')
 const ccwButton   = document.querySelector('button.ccw')
 const acwButton   = document.querySelector('button.acw')
+
+const slider = document.querySelector('.k')
 
 rightButton.addEventListener('mousedown', () =>
 {

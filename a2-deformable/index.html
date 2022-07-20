@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A2-Deformable</title>
-    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16.1/dist/lil-gui.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.141.0/examples/js/misc/GPUComputationRenderer.js"></script>
@@ -16,7 +15,7 @@
 <body>
     <canvas class="webgl"></canvas>
 
-    <!-- <div class="label">コメント</div> -->
+    <div class="label">コメント</div>
     <div class="comment">
         <div class="text">
             <p class="title">
@@ -32,6 +31,7 @@
             </p>
             <p class="content">
                 Semi-Implicit Euler積分は、Forward Euler積分に比べ安定だということがわかりました。
+                ただ、安定させるためには時間幅を小さくする必要があるため計算量はかなり大きくなるとわかりました。
             </p>
             <p class="content">
                 PBDでもGPGPU実装を試みましたが、制約の並列化の点で安定した実装は難しいことがわかりました。
@@ -46,12 +46,15 @@
     </div>
 
     <div class="ui">
-        <button type="button" class="right">right</button>
-        <button type="button" class="left">left</button>
-        <button type="button" class="up">up</button>
-        <button type="button" class="down">down</button>
-        <button type="button" class="ccw">ccw</button>
-        <button type="button" class="acw">acw</button>
+        <div class="buttons">
+            <button type="button" class="right">→</button>
+            <button type="button" class="left">←</button>
+            <button type="button" class="up">↑</button>
+            <button type="button" class="down">↓</button>
+            <button type="button" class="ccw">↻</button>
+            <button type="button" class="acw">↺</button>
+        </div>
+        <input type="range" class="k" min="200" max="600" value="300">
     </div>
     
     <script src="./script.js"></script>
