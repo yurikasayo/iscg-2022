@@ -76,6 +76,7 @@ void main()
         c = vec3(116.0 * fy - 16.0,
                  500.0 * (fx - fy),
                  200.0 * (fy - fz));
+        // c = vec3(c.x / 100.0, 0.5 + 0.5 * (c.y / 127.0), 0.5 + 0.5 * (c.z / 127.0));
     }
     else
     {
@@ -103,7 +104,7 @@ void main()
 
 const bilateralShader = `
 uniform sampler2D uTexture;
-uniform float os;
+uniform float od;
 uniform float or;
 
 varying vec2 vUv;
@@ -111,7 +112,7 @@ varying vec2 vUv;
 void main()
 {
     vec3 cp = texture2D(uTexture, vUv).rgb;
-    float r = ceil(3.0 * max(os, or));
+    float r = ceil(3.0 * max(od, or));
 
     vec3 c = vec3(0.0);
     vec3 w = vec3(0.0);
@@ -122,10 +123,10 @@ void main()
             vec3 cq = texture2D(uTexture, vUv + vec2(x, y) / resolution.xy).rgb;
             float lenS = length(vec2(x, y));
             vec3 lenR = abs(cp-cq);
-            float gs = exp(-(lenS * lenS) / (2.0 * os * os));
+            float gd = exp(-(lenS * lenS) / (2.0 * od * od));
             vec3 gq = exp(-(lenR * lenR) / (2.0 * or * or));
-            c += cq * gs * gq;
-            w += gs * gq;
+            c += cq * gd * gq;
+            w += gd * gq;
         }
     }
     c /= w;
@@ -133,6 +134,61 @@ void main()
     gl_FragColor = vec4(c, 1.0);
 }
 `
+
+const stylizeShader = `
+#define PI 3.14195265
+
+uniform sampler2D uTexture1;
+uniform sampler2D uTexture2;
+uniform float oe;
+uniform float phie;
+uniform float q;
+uniform float phiq;
+uniform bool quantize;
+
+varying vec2 vUv;
+
+void main()
+{
+    // edge detection
+    float or = sqrt(1.6) * oe;
+    float r = ceil(3.0 * or);
+
+    float se = 0.0;
+    float sr = 0.0;
+    for (float y = -r; y <= r; y++) 
+    {
+        for (float x = -r; x <= r; x++) 
+        {
+            float lumi = texture2D(uTexture1, vUv + vec2(x, y) / resolution.xy).r;
+            float len = length(vec2(x, y));
+            float ge = exp(-(len * len) / (2.0 * oe * oe));
+            float gr = exp(-(len * len) / (2.0 * or * or));
+            se += lumi * ge;
+            sr += lumi * gr;
+        }
+    }
+    se /= 2.0 * PI * oe * oe;
+    sr /= 2.0 * PI * or * or;
+
+    float d = se - 0.98 * sr;
+    float edge = d > 0.0 ? 1.0 : 1.0 + tanh(d * phie);
+
+    // luminance quantization
+    vec3 c = texture2D(uTexture2, vUv).rgb;
+    if (quantize)
+    {
+        float near = floor(c.r / 100.0 * q - 0.5) * 100.0 / q;
+        float dq = 100.0 / q;
+
+        c.r = near + dq / 2.0 * tanh(phiq * (c.r - near));
+    }
+
+    c *= edge;
+    gl_FragColor = vec4(c, 1.0);
+}
+`
+
 
 /**
  * Base
@@ -158,9 +214,9 @@ sprite.position.set(0, 0, -1)
  */
 const filterSizes = {
     width: 1,
-    height: 1
+    height: 1,
+    quality: 0.5
 }
-const quality = 0.5
 const sceneFilter = new THREE.Scene()
 const cameraFilter = new THREE.Camera()
 cameraFilter.position.z = 1
@@ -169,6 +225,7 @@ const options = {
 }
 const target = [
     new THREE.WebGLRenderTarget(1, 1, options), 
+    new THREE.WebGLRenderTarget(1, 1, options),
     new THREE.WebGLRenderTarget(1, 1, options)]
 
 const combineMaterial = new THREE.ShaderMaterial({
@@ -182,67 +239,114 @@ const combineMaterial = new THREE.ShaderMaterial({
 const bilateralMaterial = new THREE.ShaderMaterial({
     uniforms: {
         uTexture: { value: null },
-        os: { value: 3 },
+        od: { value: 3 },
         or: { value: 4.25 }
     },
     vertexShader: vertexShader,
     fragmentShader: bilateralShader
 })
+const stylizeMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        uTexture1: { value: null },
+        uTexture2: { value: null },
+        oe: { value: 3 },
+        phie: { value: 3 },
+        q: { value: 8 },
+        phiq: { value: 5 },
+        quantize: { value: true }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: stylizeShader
+})
+gui.add(filterSizes, 'quality').name('quality').min(0.1).max(1.0).step(0.05).onChange(value =>{
+    filterSizes.width = Math.ceil(video.width * filterSizes.quality)
+    filterSizes.height = Math.ceil(video.height * filterSizes.quality)
+
+    target[0].setSize(filterSizes.width, filterSizes.height)
+    target[1].setSize(filterSizes.width, filterSizes.height)
+    target[2].setSize(filterSizes.width, filterSizes.height)
+})
+
+gui.add(stylizeMaterial.uniforms.oe, 'value').name('omega e').min(1).max(5).step(0.05)
+gui.add(stylizeMaterial.uniforms.phie, 'value').name('phi e').min(0.75).max(5).step(0.05)
+gui.add(stylizeMaterial.uniforms.q, 'value').name('q').min(8).max(10).step(1)
+gui.add(stylizeMaterial.uniforms.phiq, 'value').name('phi q').min(1).max(10).step(0.05)
+gui.add(stylizeMaterial.uniforms.quantize, 'value').name('quantize')
+
 
 const meshFilter = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), combineMaterial)
 sceneFilter.add(meshFilter)
 
-let frame = 0
 let videoTexture
 let preprocessed = false
 
 const preprocess = () =>
 {
-    filterSizes.width = Math.ceil(video.width * quality)
-    filterSizes.height = Math.ceil(video.height * quality)
+    filterSizes.width = Math.ceil(video.width * filterSizes.quality)
+    filterSizes.height = Math.ceil(video.height * filterSizes.quality)
 
     target[0].setSize(filterSizes.width, filterSizes.height)
     target[1].setSize(filterSizes.width, filterSizes.height)
+    target[2].setSize(filterSizes.width, filterSizes.height)
 
-    combineMaterial.defines.resolution = 'vec2( ' + filterSizes.width.toFixed( 1 ) + ', ' + filterSizes.height.toFixed( 1 ) + ' )'
-    bilateralMaterial.defines.resolution = 'vec2( ' + filterSizes.width.toFixed( 1 ) + ', ' + filterSizes.height.toFixed( 1 ) + ' )'
+    combineMaterial.defines.resolution = 'vec2( ' + video.width.toFixed( 1 ) + ', ' + video.height.toFixed( 1 ) + ' )'
+    bilateralMaterial.defines.resolution = 'vec2( ' + video.width.toFixed( 1 ) + ', ' + video.height.toFixed( 1 ) + ' )'
+    stylizeMaterial.defines.resolution = 'vec2( ' + video.width.toFixed( 1 ) + ', ' + video.height.toFixed( 1 ) + ' )'
 
     sprite.scale.set(video.width, video.height)
     
     videoTexture = new THREE.VideoTexture(video)
 
     preprocessed = true
-
 }
 
 const renderFilter = () =>
 {
     if (!preprocessed) return 0
 
+    // rgb -> lab
     meshFilter.material = combineMaterial
     combineMaterial.uniforms.uTexture.value = videoTexture
     combineMaterial.uniforms.forward.value = true
-    renderer.setRenderTarget(target[frame])
+    renderer.setRenderTarget(target[0])
     renderer.render(sceneFilter, cameraFilter)
-    frame = 1 - frame
 
+    // abstraction : step 1 / 4
     meshFilter.material = bilateralMaterial
-    for (let i = 0; i < 3; i++)
-    {
-        bilateralMaterial.uniforms.uTexture.value = target[1-frame].texture
-        renderer.setRenderTarget(target[frame])
-        renderer.render(sceneFilter, cameraFilter)
-        frame = 1 - frame
-    }
-
-    meshFilter.material = combineMaterial
-    combineMaterial.uniforms.uTexture.value = target[1-frame].texture
-    combineMaterial.uniforms.forward.value = false
-    renderer.setRenderTarget(target[frame])
+    bilateralMaterial.uniforms.uTexture.value = target[0].texture
+    renderer.setRenderTarget(target[1])
     renderer.render(sceneFilter, cameraFilter)
-    frame = 1 - frame
 
-    sprite.material.map = target[1-frame].texture
+    // abstraction : step 2 / 4
+    bilateralMaterial.uniforms.uTexture.value = target[1].texture
+    renderer.setRenderTarget(target[0])
+    renderer.render(sceneFilter, cameraFilter)
+
+    // abstraction : step 3 / 4
+    bilateralMaterial.uniforms.uTexture.value = target[0].texture
+    renderer.setRenderTarget(target[2])
+    renderer.render(sceneFilter, cameraFilter)
+
+    // abstraction : step 4 / 4
+    bilateralMaterial.uniforms.uTexture.value = target[2].texture
+    renderer.setRenderTarget(target[1])
+    renderer.render(sceneFilter, cameraFilter)
+
+    // stylization
+    meshFilter.material = stylizeMaterial
+    stylizeMaterial.uniforms.uTexture1.value = target[0].texture
+    stylizeMaterial.uniforms.uTexture2.value = target[1].texture
+    renderer.setRenderTarget(target[2])
+    renderer.render(sceneFilter, cameraFilter)
+
+    // combert
+    meshFilter.material = combineMaterial
+    combineMaterial.uniforms.uTexture.value = target[2].texture
+    combineMaterial.uniforms.forward.value = false
+    renderer.setRenderTarget(target[0])
+    renderer.render(sceneFilter, cameraFilter)
+
+    sprite.material.map = target[0].texture
     sprite.material.needsUpdate = true
 
     renderer.setRenderTarget(null)
