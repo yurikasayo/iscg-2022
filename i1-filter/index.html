@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I1-Filter</title>
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.16"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <canvas class="webgl"></canvas>
+    <video id="videoInput"></video>
+
+    <div class="comment">
+        <div class="label">コメント</div>
+        <div class="text">
+            <p class="title">
+                実装内容
+            </p>
+            <p class="content">
+                Real-Time Video Abstraction(H.Winnemoller et al. 2006)によるキャプチャのスタイル変換をGLSLを用いて実装しました。
+            </p>
+            <p class="title">
+                考察
+            </p>
+            <p class="content">
+                L*a*b*をBilateral Filterにかけることで、RGBよりも絵に近い平滑化ができると感じました。
+            </p>
+            </p>
+            <p class="title">
+                感想
+            </p>
+            <p class="content">
+                L*a*b*色空間というものを初めて知り、自分の知識のなさを感じました。
+            </p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>
